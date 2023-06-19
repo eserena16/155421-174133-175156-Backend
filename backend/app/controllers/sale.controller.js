@@ -1,5 +1,7 @@
 const db = require("../models");
 const controllerProduct = require("../controllers/product.controller");
+const controllerSubscription = require("../controllers/subscription.controller");
+
 const {
   sale: Sale,
   user: User,
@@ -7,7 +9,7 @@ const {
   customer: Customer,
   saleProduct: SaleProduct,
 } = db;
-var { catchErrorNotAuth, catchErrorAuth } = require("../utils/loggerFunctions");
+var { catchErrorAuth } = require("../utils/loggerFunctions");
 var { logger } = require("../utils/logger");
 exports.add = async (req, res) => {
   try {
@@ -31,15 +33,19 @@ exports.add = async (req, res) => {
       });
     });
 
-    await Promise.all(saleProductsPromises);
+    const text = `<p>Estimado #nameUser,</p>
+        <p>Se ha realizado una venta del producto #product.</p>        
+        <p>El equipo de nuestra aplicación</p>`;
+    const subject = "Notificación por venta de producto";    
+    controllerSubscription.notificateUser(req, subject, text);
     logger.info({
       message: `Sale was created successfully.`,
       sale_id: sale.id,
       company_id: req.companyId,
     });
+    await Promise.all(saleProductsPromises);
     res.send({ message: "Sale was added successfully!" });
-  } catch (error) {
-    console.error(error);
+  } catch (error) {    
     logger.error({
       message: `An error occurred while creating sale.`,
       customer_name: req.body.customer.name,
@@ -83,8 +89,7 @@ exports.addScheduled = async (req, res) => {
       company_id: req.companyId,
     });
     res.send({ message: "Sale scheduled was added successfully!" });
-  } catch (error) {
-    console.error(error);
+  } catch (error) {    
     logger.error({
       message: `An error occurred while creating sale scheduled.`,
       customer_name: req.body.customer.name,

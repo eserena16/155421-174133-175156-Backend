@@ -17,34 +17,40 @@ services:
       - my-network
   app:
     depends_on:
-      - postgres
-      - redis
+      - postgres         
+      - rabbitmq
     build: ./backend
     restart: unless-stopped
     env_file: ./.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
     environment:
-      - DB_HOST=postgres
-      - DB_USER=$POSTGRES_USER
-      - DB_PASSWORD=$POSTGRES_PASSWORD
-      - DB_NAME=$POSTGRES_DATABASE
-      - DB_PORT=$POSTGRES_DOCKER_PORT
+      - RDS_HOSTNAME=postgres
+      - RDS_USERNAME=$POSTGRES_USER
+      - RDS_PASSWORD=$POSTGRES_PASSWORD
+      - RDS_DB_NAME=$POSTGRES_DATABASE
+      - RDS_PORT=$POSTGRES_DOCKER_PORT      
+      - MQ_HOST_INVITATION=amqp://rabbitmq
+      - MQ_EXCHANGE_INVITATION=INVITATION
+      - MQ_HOST_SUBSCRIPTION=amqp://rabbitmq
+      - MQ_EXCHANGE_SUBSCRIPTION=SUBSCRIPTION
     stdin_open: true
     tty: true
     networks:
-      - my-network
-  redis:
-    image: 'redis:latest'
+      - my-network  
+  rabbitmq:
+    image: rabbitmq:3-management
     ports:
-      - "$REDIS_DOCKER_PORT:$REDIS_DOCKER_PORT"
+      - 5672:5672
+      - 15672:15672
     volumes:
-      - redis-data:/data
+      - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - my-network
 volumes:
   db:
-  redis-data:
+  rabbitmq_data:
+  
 networks:
   my-network:
     driver: bridge

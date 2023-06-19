@@ -11,8 +11,13 @@ module.exports = function (app) {
     controller.add
   );
 
+  app.get(
+    "/api/subscriptions",    
+    controller.getSubscriptions
+  );
+
   app.delete(
-    "/api/subscriptions",
+    "/api/subscriptions/:id",
     [verifySubscription.checkSubscriptionExisted],
     controller.delete
   );

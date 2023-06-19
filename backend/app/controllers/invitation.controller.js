@@ -1,4 +1,5 @@
 const db = require("../models");
+const sendNotification  = require("../utils/sendNotification");
 const { invitation: Invitation, user: User, role: Role } = db;
 const config = require("../config/invitation.config");
 var bcrypt = require("bcryptjs");
@@ -26,10 +27,19 @@ exports.send = async (req, res) => {
         invitationId: invitation.id,
         userEmail: user.email,
       });
-
-      const registrationLink = `${config.frontendUrl}/register?invitation=${invitation.id}`;
-      // Enviar mail ***********
-      res.send({ message: "Invitation register successfully." });
+      const registrationLink = `${config.frontendUrl}/register?invitation=${invitation.id}`;      
+      const message = {
+        to: emailTo,
+        from: config.from,
+        html: `<p>Hola,</p>
+        <p>Has sido invitado a unirte a nuestra aplicación a la empresa ${user.company.name}. Haz clic en el siguiente enlace para registrarte:</p>
+        <p><a href="${registrationLink}">${registrationLink}</a></p>
+        <p>Gracias,</p>
+        <p>El equipo de nuestra aplicación</p>`,
+        subject: config.subject,
+      };
+      sendNotification.sendMessage(req, config.hostMQhost, config.exchangeMQ, "INVITATION", message);
+      res.send({ message: "Invitation register successfully." });      
     }
   } catch (error) {
     return catchErrorAuth(

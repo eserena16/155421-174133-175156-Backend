@@ -233,8 +233,8 @@ exports.getProducts = async (req, res) => {
     }
   } catch (error) {
     return catchErrorAuth(
-      "refreshToken",
-      "An error occurred during refreshing token.",
+      "getProducts",
+      "An error occurred during getProducts.",
       error,
       req,
       res

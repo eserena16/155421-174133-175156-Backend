@@ -26,12 +26,9 @@ checkDuplicateSubscription = (req, res, next) => {
 };
 
 checkSubscriptionExisted = (req, res, next) => {
-  Subscription.findOne({
-    where: {
-      userId: req.userId,
-      productId: req.body.productId,
-    },
-  }).then((subscription) => {
+  Subscription.findByPk(
+    req.params.id
+  ).then((subscription) => {
       if (!subscription) {
         logger.error({
           action: "checkSubscriptionExisted",

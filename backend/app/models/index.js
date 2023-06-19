@@ -4,13 +4,12 @@ const Sequelize = require("sequelize");
 const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
   host: config.HOST,
   port: config.PORT,
-  dialect: config.dialect,
-  operatorsAliases: false,
+  dialect: config.dialect,  
   logging: false,
   pool: {
     max: config.pool.max,
     min: config.pool.min,
-    acquire: config.pool.acquire,
+    acquire: config.pool.acquire,    
     idle: config.pool.idle,
   },
 });
@@ -130,14 +129,17 @@ db.sale.belongsToMany(db.product, {
   otherKey: "productId",
 });
 
-db.product.belongsToMany(db.user, {
-  through: db.subscription,
-  foreignKey: 'productId',
+
+db.subscription.belongsTo(db.user, {
+  foreignKey: "userId",
+  as: "user",
+  allowNull: false,
 });
 
-db.user.belongsToMany(db.product, {
-  through: db.subscription,
-  foreignKey: 'userId',
+db.subscription.belongsTo(db.product, {
+  foreignKey: "productId",
+  as: "product",
+  allowNull: false,
 });
 
 db.ROLES = ["user", "admin"];

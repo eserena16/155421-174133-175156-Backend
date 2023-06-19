@@ -1,4 +1,3 @@
-const { verifySignUp } = require("../middlewares");
 const controller = require("../controllers/sale.controller");
 const verifySale = require("../middlewares/verifySale");
 

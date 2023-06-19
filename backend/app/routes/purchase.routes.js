@@ -1,4 +1,4 @@
-const { verifySignUp, authJwt } = require("../middlewares");
+const { authJwt } = require("../middlewares");
 const controller = require("../controllers/purchase.controller");
 const verifyPurchase = require("../middlewares/verifyPurchase");
 const verifySupplier = require("../middlewares/verifySupplier");

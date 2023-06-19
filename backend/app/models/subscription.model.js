@@ -8,6 +8,11 @@ module.exports = (sequelize, Sequelize) => {
     },
     });
 
+    Subscription.associate = (models) => {
+        Subscription.belongsToMany(models.User, { foreignKey: 'userId', as: "users" });
+        Subscription.belongsToMany(models.Product, { foreignKey: 'productId', as: "products" });
+      };
+
     return Subscription;
   };
   

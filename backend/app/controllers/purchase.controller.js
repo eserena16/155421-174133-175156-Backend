@@ -1,5 +1,7 @@
 const db = require("../models");
 const controllerProduct = require("../controllers/product.controller");
+const controllerSubscription = require("../controllers/subscription.controller");
+
 const {
   purchase: Purchase,
   user: User,
@@ -9,6 +11,7 @@ const {
 } = db;
 var { catchErrorAuth } = require("../utils/loggerFunctions");
 var { logger } = require("../utils/logger");
+const { json } = require("sequelize");
 
 exports.add = async (req, res) => {
   try {
@@ -20,16 +23,30 @@ exports.add = async (req, res) => {
       companyId: req.companyId,
     });
 
+    const { date, total, supplierId, companyId, products } = purchase;
+    const desiredJson = {
+      date,
+      total,
+      supplier: supplierId,
+      company: companyId,
+      products
+    };
+    
     const purchaseProductsPromises = req.body.products.map(
       (purchaseProduct) => {
-        controllerProduct.updateStock(purchaseProduct.productId, purchaseProduct.count);
+        controllerProduct.updateStock(purchaseProduct.productId, purchaseProduct.count);        
         return PurchaseProduct.create({
           purchaseId: purchase.id,
           productId: purchaseProduct.productId,
           count: purchaseProduct.count,
         });
       }
-    );
+    );    
+    const text = `<p>Estimado #nameUser,</p>
+        <p>Se ha realizado una compra del producto #product.</p>        
+        <p>El equipo de nuestra aplicación</p>`;
+    const subject = "Notificación por compra de producto";    
+    controllerSubscription.notificateUser(req, subject, text);    
     logger.info({
       action: "addPurchase",
       message: `Purchase was added successfully.`,
