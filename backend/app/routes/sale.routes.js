@@ -14,6 +14,8 @@ module.exports = function (app) {
     controller.addScheduled
   );
 
+  app.get("/api/sales/dashboard", [], controller.dashboard);
+
   app.get("/api/sales/:id", [], controller.get);
 
   app.get("/api/sales", [], controller.getSales);

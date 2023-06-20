@@ -10,6 +10,8 @@ module.exports = function (app) {
     controller.add
   );
 
+  app.get("/api/purchases/dashboard", controller.dashboard);
+
   app.get("/api/purchases/:id", [authJwt.isAdmin], controller.get);
 
   app.get("/api/purchases", [authJwt.isAdmin], controller.getPurchases);

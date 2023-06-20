@@ -1,6 +1,7 @@
 const db = require("../models");
 const controllerProduct = require("../controllers/product.controller");
 const controllerSubscription = require("../controllers/subscription.controller");
+const Op = db.Sequelize.Op;
 
 const {
   purchase: Purchase,
@@ -9,7 +10,7 @@ const {
   supplier: Supplier,
   purchaseProduct: PurchaseProduct,
 } = db;
-var { catchErrorAuth } = require("../utils/loggerFunctions");
+var { catchErrorAuth, catchErrorServer } = require("../utils/loggerFunctions");
 var { logger } = require("../utils/logger");
 const { json } = require("sequelize");
 
@@ -39,7 +40,7 @@ exports.add = async (req, res) => {
           purchaseId: purchase.id,
           productId: purchaseProduct.productId,
           count: purchaseProduct.count,
-        });
+        });        
       }
     );    
     const text = `<p>Estimado #nameUser,</p>
@@ -55,7 +56,6 @@ exports.add = async (req, res) => {
       companyId: req.companyId,
     });
     await Promise.all(purchaseProductsPromises);
-
     return res.send({ message: "Purchase was added successfully!" });
   } catch (error) {
     return catchErrorAuth(
@@ -125,6 +125,55 @@ exports.getPurchases = async (req, res) => {
       error,
       req,
       res
+    );
+  }
+};
+
+exports.dashboard = async (req, res) => {
+  try {
+    const purchases = await Purchase.scope({
+      method: ["byCompany", req.companyId],
+    }).findAll({
+      where: {
+        date: {
+          [Op.gte]: req.query.dateFrom,
+          [Op.lte]: req.query.dateTo,
+        },
+      },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['id', 'name', 'count'],
+        },
+      ],
+      attributes: ['id', 'date', 'supplierId', 'userId'],
+    });
+
+    if (purchases && purchases.length > 0) {
+      res.send({ purchases });
+      logger.info({
+        action: "dashboardPurchases",
+        message: `Purchases were found successfully.`,
+      });
+    } else {
+      logger.warn({
+        action: "dashboardPurchases",
+        message: `No purchases were found.`,
+        date_from: req.query.dateFrom,
+        date_to: req.query.dateTo,
+      });
+      res.status(200).send({
+        message: `No purchases were found.`,
+      });
+    }
+  } catch (error) {
+    return catchErrorServer(
+      "dashboard",
+      "An error occurred during fetching purchases.",
+      error,   
+      req,
+      res         
     );
   }
 };

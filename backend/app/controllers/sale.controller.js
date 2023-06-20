@@ -1,6 +1,7 @@
 const db = require("../models");
 const controllerProduct = require("../controllers/product.controller");
 const controllerSubscription = require("../controllers/subscription.controller");
+const Op = db.Sequelize.Op;
 
 const {
   sale: Sale,
@@ -9,7 +10,7 @@ const {
   customer: Customer,
   saleProduct: SaleProduct,
 } = db;
-var { catchErrorAuth } = require("../utils/loggerFunctions");
+var { catchErrorAuth, catchErrorServer } = require("../utils/loggerFunctions");
 var { logger } = require("../utils/logger");
 exports.add = async (req, res) => {
   try {
@@ -157,6 +158,56 @@ exports.getSales = async (req, res) => {
     return catchErrorAuth(
       "getSales",
       "An error occurred during deletion product.",
+      error,
+      req,
+      res
+    );
+  }
+};
+
+exports.dashboard = async (req, res) => {
+  try {
+    const sales = await Sale.scope({
+      method: ["byCompany", req.companyId],
+    }).findAll({
+      where: {
+        date: {
+          [Op.gte]: req.query.dateFrom,
+          [Op.lte]: req.query.dateTo,
+        },
+        status: "confirmed"
+      },
+      include: [
+        {
+          model: Product,
+          as: 'products',
+          attributes: ['id', 'name', 'count'],
+        },
+      ],
+      attributes: ['id', 'date', 'userId'],
+    });
+
+    if (sales && sales.length > 0) {
+      res.send({ sales });
+      logger.info({
+        action: "dashboardSale",
+        message: `Sales were found successfully.`,
+      });
+    } else {
+      logger.warn({
+        action: "dashboardSale",
+        message: `No sales were found.`,
+        date_from: req.query.dateFrom,
+        date_to: req.query.dateTo,
+      });
+      res.status(200).send({
+        message: `No sales were found.`,
+      });
+    }
+  } catch (error) {
+    return catchErrorServer(
+      "dashboard",
+      "An error occurred during fetching sales.",
       error,
       req,
       res
