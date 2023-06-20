@@ -21,17 +21,12 @@ db.sequelize = sequelize;
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
+db.userRoles = require("../models/userRoles.model.js")(sequelize,Sequelize);
 db.company = require("../models/company.model.js")(sequelize, Sequelize);
 db.sale = require("../models/sale.model.js")(sequelize, Sequelize);
-db.saleProduct = require("../models/saleProduct.model.js")(
-  sequelize,
-  Sequelize
-);
+db.saleProduct = require("../models/saleProduct.model.js")(sequelize,Sequelize);
 db.purchase = require("./purchase.model.js")(sequelize, Sequelize);
-db.purchaseProduct = require("./purchaseProduct.model.js")(
-  sequelize,
-  Sequelize
-);
+db.purchaseProduct = require("./purchaseProduct.model.js")(sequelize,Sequelize);
 db.supplier = require("../models/supplier.model.js")(sequelize, Sequelize);
 db.product = require("../models/product.model.js")(sequelize, Sequelize);
 db.invitation = require("../models/invitation.model.js")(sequelize, Sequelize);

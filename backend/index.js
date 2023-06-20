@@ -1,4 +1,5 @@
 require("dotenv").config();
+const controller = require("./app/controllers/admin.controller");
 
 const newRelic = require("newrelic");
 const express = require("express");
@@ -20,7 +21,7 @@ const { company, role, user } = require("./app/models");
 
 if (process.env.NODE_ENV === "production") {
   db.sequelize.sync().then(() => {
-    //initial();
+
   });
 } else {
   db.sequelize.sync({ force: true }).then(() => {
@@ -35,7 +36,6 @@ app.get("/", (req, res) => {
 const config = require("./app/config/auth.config.js");
 const authJwt = require("./app/middlewares/authJwt");
 
-
 // routes
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "authorization");
@@ -45,7 +45,6 @@ app.use((req, res, next) => {
   }
   authJwt.verifyToken(req, res, next);
 });
-
 
 require("./app/routes/admin.routes")(app);
 require("./app/routes/auth.routes")(app);
@@ -68,42 +67,60 @@ app.listen(PORT, () => {
   });
 });
 
-function initial() {
+async function initial() {
   try
-  {        
-    role.create({
+  { 
+    
+    await role.create({
       id: 1,
       name: "user",
-    });    
-    role.create({
+    });
+  
+    await role.create({
       id: 2,
       name: "admin",
-    });    
-    company.create({
+    });
+
+    await company.create({
       name: "ORT",
     });    
-    const adminUser = {
-      name: "Usuario Administrador",
-      email: "admin@ort.com",
-      password: bcrypt.hashSync("Password1", 8),    
-      roleId: 2,
-      companyId: 1,
-    };
-    
-    user.create(adminUser);
+        
     const normalUser = {
       name: "Usuario Empleado",
       email: "empleado@ort.com",
-      password: bcrypt.hashSync("Password1", 8),
-      roleId: 1,
+      password: bcrypt.hashSync("Password1", 8),      
       companyId: 1,
-    };    
-    user.create(normalUser);    
-  }catch(error){
+      userRoles: [1]
+    };        
+    
+    await user.create(normalUser);
+
+    const adminUser = {
+      name: "Usuario Administrador",
+      email: "admin@ort.com",
+      password: bcrypt.hashSync("Password1", 8),          
+      companyId: 1,      
+      userRoles: [2]
+    };
+    await user.create(adminUser);
+
+    await db.userRoles.create(
+      {
+        userId: 1,
+        roleId: 1
+      });
+    await db.userRoles.create(
+      {
+        userId: 2,
+        roleId: 2
+      });
+    
+  }catch(error){    
+
     logger.error({
       message: `An error occurred while executing initialization.`,      
       error_message: error.message,
-      error_stack: error.stack,      
+      error_stack: error.stack,
     });
   }
 }
