@@ -1,13 +1,13 @@
 var { logger } = require("../utils/logger");
 const sequelize = require("../models/index").sequelize;
 const config = require("../config/subscription.config");
-const amqp = require('amqplib');
+const amqp = require("amqplib");
 
-exports.get = async (req, res) => {  
+exports.get = async (req, res) => {
   let errorMessage = "";
   try {
     await sequelize.authenticate();
-  } catch (error) {    
+  } catch (error) {
     logger.error({
       action: "healthcheck",
       message: `Error connecting to database.`,
@@ -17,32 +17,27 @@ exports.get = async (req, res) => {
     });
     errorMessage += "Error connecting to database. ";
   }
-
-    
-	const connection = await amqp.connect(config.hostMQ);
+  try {
+    const connection = await amqp.connect(config.hostMQ);
     const channel = await connection.createChannel();
     await channel.close();
     await connection.close();
-  } catch (error) {        
+  } catch (error) {
     logger.error(
       "connection queue",
       "An error occurred during connection queue.",
-      error      
+      error
     );
     errorMessage += "Error connecting to queue. ";
   }
 
   if (errorMessage !== "") {
-    res.status(503).send(
-      {
-        message: errorMessage,
-      }
-    );
+    res.status(503).send({
+      message: errorMessage,
+    });
   } else {
-    res.status(200).send(
-      {
-        message: `Database connection and queue connection successful.`,
-      }
-    );
+    res.status(200).send({
+      message: `Database connection and queue connection successful.`,
+    });
   }
 };

@@ -47,6 +47,15 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - my-network
+  healthchecker:
+    build:
+      context: ./healthchecker # Ruta al directorio que contiene el Dockerfile y el código del healthchecker
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $HEALTH_PORT:$HEALTH_PORT
+    networks:
+      - my-network
 volumes:
   db:
   rabbitmq_data:
