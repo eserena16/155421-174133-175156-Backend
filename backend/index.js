@@ -18,11 +18,9 @@ const db = require("./app/models");
 
 const { company, role, user } = require("./app/models");
 
-
-
 if (process.env.NODE_ENV === "production") {
   db.sequelize.sync().then(() => {
-    initial();
+    //initial();
   });
 } else {
   db.sequelize.sync({ force: true }).then(() => {
@@ -48,6 +46,10 @@ app.use((req, res, next) => {
   authJwt.verifyToken(req, res, next);
 });
 
+
+require("./app/routes/admin.routes")(app);
+require("./app/routes/auth.routes")(app);
+require("./app/routes/report.routes")(app);
 require("./app/routes/invitation.routes")(app);
 require("./app/routes/product.routes")(app);
 require("./app/routes/supplier.routes")(app);
@@ -55,10 +57,10 @@ require("./app/routes/purchase.routes")(app);
 require("./app/routes/sale.routes")(app);
 require("./app/routes/subscription.routes")(app);
 
+
 const { logger } = require("./app/utils/logger");
 const PORT = process.env.NODE_DOCKER_PORT || 8080;
-app.listen(PORT, () => {
-  console.log("Server is running");
+app.listen(PORT, () => {  
   logger.info({
     action: "serverStart",
     message: `Server is running on port ${PORT}.`,
@@ -67,30 +69,41 @@ app.listen(PORT, () => {
 });
 
 function initial() {
-  role.create({
-    id: 1,
-    name: "user",
-  });
-
-  role.create({
-    id: 2,
-    name: "admin",
-  });
-  company.create({
-    name: "ORT",
-  });
-  const adminUser = {
-    email: "admin@ort.com",
-    password: bcrypt.hashSync("Password1", 8),
-    roleId: 2,
-    companyId: 1,
-  };
-  user.create(adminUser);
-  const normalUser = {
-    email: "empleado@ort.com",
-    password: bcrypt.hashSync("Password1", 8),
-    roleId: 1,
-    companyId: 1,
-  };
-  user.create(normalUser);
+  try
+  {        
+    role.create({
+      id: 1,
+      name: "user",
+    });    
+    role.create({
+      id: 2,
+      name: "admin",
+    });    
+    company.create({
+      name: "ORT",
+    });    
+    const adminUser = {
+      name: "Usuario Administrador",
+      email: "admin@ort.com",
+      password: bcrypt.hashSync("Password1", 8),    
+      roleId: 2,
+      companyId: 1,
+    };
+    
+    user.create(adminUser);
+    const normalUser = {
+      name: "Usuario Empleado",
+      email: "empleado@ort.com",
+      password: bcrypt.hashSync("Password1", 8),
+      roleId: 1,
+      companyId: 1,
+    };    
+    user.create(normalUser);    
+  }catch(error){
+    logger.error({
+      message: `An error occurred while executing initialization.`,      
+      error_message: error.message,
+      error_stack: error.stack,      
+    });
+  }
 }
