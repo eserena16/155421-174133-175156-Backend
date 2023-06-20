@@ -10,7 +10,7 @@ exports.notificatePurchase = async (req, purchase) => {
       company: purchase.companyId,
       purchaseDate: purchase.date,
       total: purchase.total,
-      supplierId: purchase.suplierId,
+      supplierId: purchase.supplierId,
       products: req.body.products,
       type: "P"
     };    
@@ -27,13 +27,12 @@ exports.notificatePurchase = async (req, purchase) => {
 
 exports.notificateSale = async (req, sale) => {    
   try{    
-    const message = { "message" : {
+    const message = { 
         company: sale.companyId,
         saleDate: sale.date,
         total: sale.total,
         products: req.body.products,
-        type: "S"
-      }
+        type: "S"      
     };    
     sendNotification.sendMessage(req, config.hostMQ, config.exchangeMQ, "API", message);    
   } catch (error) {    
