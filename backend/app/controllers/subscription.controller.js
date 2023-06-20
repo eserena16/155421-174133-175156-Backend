@@ -33,8 +33,7 @@ exports.add = (req, res) => {
 };
 
 exports.notificateUser = async (req, subject, text) => {  
-  const productsId = req.body.products.map((product) => product.productId);
-  console.log("req.body.products" + JSON.stringify(req.body.products));
+  const productsId = req.body.products.map((product) => product.productId);  
   try{
     const subscriptions = await Subscription.findAll({
       where: {
@@ -66,11 +65,9 @@ exports.notificateUser = async (req, subject, text) => {
         sendNotification.sendMessage(req, config.hostMQ, config.exchangeMQ, "SUBSCRIPTION", message);
       });      
     } else {
-      logger.warn({
+      logger.info({
         action: "notificateUser",
-        message: `No users to notify.`,
-        req: req,
-        message: message
+        message: `No users to notify.`,          
       });      
     }
   } catch (error) {    

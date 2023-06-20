@@ -56,7 +56,7 @@ require("./app/routes/supplier.routes")(app);
 require("./app/routes/purchase.routes")(app);
 require("./app/routes/sale.routes")(app);
 require("./app/routes/subscription.routes")(app);
-
+require("./app/routes/healthcheck.routes")(app);
 
 const { logger } = require("./app/utils/logger");
 const PORT = process.env.NODE_DOCKER_PORT || 8080;
