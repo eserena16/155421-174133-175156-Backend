@@ -45,13 +45,12 @@ exports.login = (req, res) => {
         });
       }
 
-      let role = (await user.getRoles()).includes("admin") ? "admin" : "user";
-
+      let roles = await user.getRoles();            
       const token = jwt.sign(
         {
           id: user.id,
           companyId: user.companyId,
-          role: role,
+          role: roles.some((rol) => rol.name === "admin") ? "admin" : "user",
           name: user.name,
           email: user.email,
         },
