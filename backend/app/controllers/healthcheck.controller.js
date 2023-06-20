@@ -18,12 +18,12 @@ exports.get = async (req, res) => {
     errorMessage += "Error connecting to database. ";
   }
 
-  try {
-    const connection = await amqp.connect("sdasd");
+  try {    
+    const connection = await amqp.connect("amqp://jackal-01.rmq.cloudamqp.com");
     const channel = await connection.createChannel();
     await channel.close();
     await connection.close();
-  } catch (error) {    
+  } catch (error) {        
     logger.error(
       "connection queue",
       "An error occurred during connection queue.",

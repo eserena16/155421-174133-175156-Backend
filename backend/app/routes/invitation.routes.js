@@ -5,7 +5,7 @@ const verifyInvitation = require("../middlewares/verifyInvitation");
 module.exports = function (app) {
   app.post(
     "/api/invitation/send",
-    [verifyInvitation.checkData, verifyInvitation.checkDuplicateInvitation],
+    [authJwt.isAdmin, verifyInvitation.checkData, verifyInvitation.checkDuplicateInvitation],
     controller.send
   );
   app.put(
