@@ -18,8 +18,8 @@ exports.get = async (req, res) => {
     errorMessage += "Error connecting to database. ";
   }
 
-  try {    
-    const connection = await amqp.connect("amqp://jackal-01.rmq.cloudamqp.com");
+    
+	const connection = await amqp.connect(config.hostMQ);
     const channel = await connection.createChannel();
     await channel.close();
     await connection.close();
