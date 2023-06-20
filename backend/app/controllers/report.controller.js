@@ -18,10 +18,6 @@ exports.send = async (req, res) => {
     
     const mailUser = await User.findByPk(req.userId, {
     attributes: ['email']});
-
-    console.log("mailUser: " + JSON.stringify(mailUser));
-    console.log("mailUser.email: " + JSON.parse(JSON.stringify(mailUser)).email);
-
     if(countSales === 0 && countPurchases === 0 ){
       res.status(200).send({
         message: `No sales and purchase were found.`,

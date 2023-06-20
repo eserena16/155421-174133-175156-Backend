@@ -1,6 +1,7 @@
 const db = require("../models");
 const controllerProduct = require("../controllers/product.controller");
 const controllerSubscription = require("../controllers/subscription.controller");
+const controllerApi = require("../controllers/api.controller");
 const Op = db.Sequelize.Op;
 
 const {
@@ -47,7 +48,8 @@ exports.add = async (req, res) => {
         <p>Se ha realizado una compra del producto #product.</p>        
         <p>El equipo de nuestra aplicación</p>`;
     const subject = "Notificación por compra de producto";    
-    controllerSubscription.notificateUser(req, subject, text);    
+    controllerSubscription.notificateUser(req, subject, text);
+    controllerApi.notificatePurchase(req, purchase);
     logger.info({
       action: "addPurchase",
       message: `Purchase was added successfully.`,

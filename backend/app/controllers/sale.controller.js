@@ -1,6 +1,7 @@
 const db = require("../models");
 const controllerProduct = require("../controllers/product.controller");
 const controllerSubscription = require("../controllers/subscription.controller");
+const controllerApi = require("../controllers/api.controller");
 const Op = db.Sequelize.Op;
 
 const {
@@ -45,6 +46,7 @@ exports.add = async (req, res) => {
       company_id: req.companyId,
     });
     await Promise.all(saleProductsPromises);
+    controllerApi.notificateSale(req, sale);
     res.send({ message: "Sale was added successfully!" });
   } catch (error) {    
     logger.error({
