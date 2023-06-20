@@ -1,4 +1,4 @@
-const { verifyRegister } = require("../middlewares");
+const { verifyRegister, authJwt } = require("../middlewares");
 const controller = require("../controllers/invitation.controller");
 const verifyInvitation = require("../middlewares/verifyInvitation");
 
